@@ -56,3 +56,8 @@ else:
     st.write("This app is part of Lab 01.")
     st.write("Course: Web App Development for Data Science")
     st.write("Project Theme: EduRisk Analytics")
+
+    st.subheader("Student Information")
+    st.write("Name: Heng Hour")
+    st.write("Student ID: 0007307")
+    st.write("Class: M2")
