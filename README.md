@@ -27,6 +27,6 @@ streamlit run app.py
 
 ## Student Information
 
-Name:
-Student ID:
-Class:
+Name: Heng Hour
+Student ID: 0007307
+Class: M2
