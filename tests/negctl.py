@@ -15,8 +15,11 @@ never existed is reported as BROKEN rather than silently recorded as survived.
 from __future__ import annotations
 
 import hashlib
+import os
 import subprocess
 import sys
+import time
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -64,7 +67,7 @@ MUTANTS: list[tuple[str, str, str, int]] = [
     ),
     (
         "page config: set_page_config moved below the first command",
-        'st.set_page_config(\n    page_title="EduRisk Analytics - Lab 02",\n    page_icon="\U0001f393",\n    layout="wide"\n)\n\n',
+        'st.set_page_config(\n    page_title="EduRisk Analytics - Lab 02",\n    layout="wide"\n)\n\n',
         "",
         1,
     ),
@@ -155,6 +158,30 @@ MUTANTS: list[tuple[str, str, str, int]] = [
         1,
     ),
     (
+        "theme: an emoji is put back into the app",
+        'st.title("EduRisk Analytics")',
+        'st.title("\U0001f393 EduRisk Analytics")',
+        1,
+        "app",
+    ),
+    (
+        "theme: charts go back to Streamlit's default blue",
+        'st.bar_chart(score_chart, color="#CC0000")',
+        "st.bar_chart(score_chart)",
+        1,
+        "theme",
+    ),
+    (
+        "theme: the dot field is removed from the backdrop",
+        "  background-image:\n    radial-gradient(var(--v-white-06) 1px, transparent 1.5px),\n"
+        "    radial-gradient(var(--v-white-10) 1px, transparent 1.5px),\n"
+        "    radial-gradient(var(--v-white-16) 1px, transparent 1.4px);\n"
+        "  background-size: 66px 66px, 22px 22px, 11px 11px;",
+        "  background-image: none;\n  background-size: auto;",
+        1,
+        "theme",
+    ),
+    (
         "empty-guard removed: metrics report NaN instead of 0 on an empty result",
         "    if len(filtered_df) > 0:\n        average_score = filtered_df[\"Score\"].mean()",
         "    if True:\n        average_score = filtered_df[\"Score\"].mean()",
@@ -175,6 +202,59 @@ def run_suite() -> tuple[int, str]:
     return p.returncode, (p.stdout + p.stderr)
 
 
+# --- theme mutants -------------------------------------------------------
+# CSS and the Vega-Lite spec do not exist in AppTest at all, so theme mutants
+# have to be judged by a real browser against a real Streamlit server. The
+# server is started once and relies on Streamlit's own file watcher to reload
+# after each mutation, which is what makes this affordable.
+PORT = 8791
+SERVER: subprocess.Popen | None = None
+
+
+def start_server() -> subprocess.Popen:
+    global SERVER
+    SERVER = subprocess.Popen(
+        [str(ROOT / ".venv" / "bin" / "streamlit"), "run", "app.py",
+         "--server.headless", "true", "--server.port", str(PORT),
+         "--browser.gatherUsageStats", "false"],
+        cwd=str(ROOT), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    for _ in range(60):
+        time.sleep(1)
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{PORT}/_stcore/health", timeout=2) as r:
+                if r.read().strip() == b"ok":
+                    return SERVER
+        except Exception:
+            continue
+    raise SystemExit("theme server did not come up")
+
+
+def stop_server() -> None:
+    global SERVER
+    if SERVER is not None:
+        SERVER.terminate()
+        try:
+            SERVER.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            SERVER.kill()
+        SERVER = None
+
+
+def run_theme_suite() -> tuple[int, str]:
+    time.sleep(6)  # let Streamlit's file watcher reload the mutated app
+    env = dict(os.environ)
+    env["NODE_PATH"] = subprocess.run(
+        ["npm", "root", "-g"], capture_output=True, text=True
+    ).stdout.strip()
+    p = subprocess.run(
+        ["node", str(ROOT / "tests" / "verify_theme.js"),
+         f"http://127.0.0.1:{PORT}", "/tmp/opencode/negctl-shots"],
+        capture_output=True, text=True, timeout=600, cwd=str(ROOT), env=env,
+    )
+    return p.returncode, (p.stdout + p.stderr)
+
+
 def main() -> int:
     original_text = APP.read_text(encoding="utf-8")
     original_sha = sha(APP)
@@ -188,8 +268,24 @@ def main() -> int:
     print(f"baseline: PASS ({original_sha[:12]})")
 
     results: list[tuple[str, str]] = []
+    theme_needed = any(len(m) > 4 and m[4] == "theme" for m in MUTANTS)
+    server_up = False
     try:
-        for name, old, new, expected in MUTANTS:
+        if theme_needed:
+            start_server()
+            server_up = True
+            rc, out = run_theme_suite()
+            if rc != 0:
+                print("THEME BASELINE FAILED -- refusing to mutation-test a broken theme")
+                print(out[-3000:])
+                return 2
+            print("theme baseline: PASS")
+
+        for mutant_spec in MUTANTS:
+            name, old, new, expected = mutant_spec[:4]
+            kind = mutant_spec[4] if len(mutant_spec) > 4 else "app"
+            runner = run_theme_suite if kind == "theme" else run_suite
+
             found = original_text.count(old)
             if found != expected:
                 results.append((name, f"BROKEN anchor (found {found}, expected {expected})"))
@@ -209,7 +305,7 @@ def main() -> int:
                 continue
 
             try:
-                rc, out = run_suite()
+                rc, out = runner()
             finally:
                 APP.write_text(original_text, encoding="utf-8")
                 if sha(APP) != original_sha:
@@ -232,6 +328,8 @@ def main() -> int:
         APP.write_text(original_text, encoding="utf-8")
         if sha(APP) != original_sha:
             raise SystemExit("FATAL: app.py was not restored")
+        if server_up:
+            stop_server()
 
     print()
     survived = [n for n, v in results if v == "SURVIVED"]

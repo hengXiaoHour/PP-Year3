@@ -14,6 +14,7 @@ risk rule, so the two must agree.
 from __future__ import annotations
 
 import ast
+import re
 import sys
 from pathlib import Path
 
@@ -215,8 +216,17 @@ first_st = calls[0].func.attr if calls else "<none>"
 eq("set_page_config is the first Streamlit command", first_st, "set_page_config")
 cfg = kwargs_of(calls[0]) if calls else {}
 eq("page_title is the Lab 02 title", literal(cfg.get("page_title")), "EduRisk Analytics - Lab 02")
+eq("page_icon removed - no emoji in the page config", "page_icon" in cfg, False)
 eq("layout is wide", literal(cfg.get("layout")), "wide")
-eq("page_icon is the graduation cap", literal(cfg.get("page_icon")), "\U0001f393")
+
+# No emoji anywhere in app.py: the theme brief requires the signature
+# black/white/red look with no pictographs.
+EMOJI = re.compile(
+    "[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U0001F1E6-\U0001F1FF⬀-⯿]"
+)
+found = sorted(set(EMOJI.findall(SOURCE)))
+eq("app.py contains no emoji", found, [])
+eq("page_icon kwarg is absent from the source", "page_icon" in SOURCE, False)
 
 # ---- Lab 01 continuity -------------------------------------------------
 # The teacher requires Lab 02 to BUILD ON Lab 01, so the two Lab 01 features
