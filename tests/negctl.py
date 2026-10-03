@@ -132,6 +132,29 @@ MUTANTS: list[tuple[str, str, str, int]] = [
         1,
     ),
     (
+        "lab01 continuity: the 'Click Me' button is deleted again",
+        "    # Carried over from Lab 01.\n    if st.button(\"Click Me\"):\n        st.write(\"Welcome\")\n",
+        "",
+        1,
+    ),
+    (
+        "lab01 continuity: the 'Low Score Students' metric is deleted again",
+        '    # Carried over from Lab 01, kept as its own row so the Lab 02 metric row\n'
+        '    # above stays exactly as the lab sheet defines it.\n'
+        '    st.subheader("From Lab 01")\n    lab1_col1, lab1_col2 = st.columns(2)\n\n'
+        '    with lab1_col1:\n        st.metric("Low Score Students", low_score_students)\n\n'
+        '    with lab1_col2:\n'
+        '        st.caption("Count of students scoring below 60, carried over from Lab 01.")\n',
+        "",
+        1,
+    ),
+    (
+        "lab01 continuity: the low-score threshold changes from 60 to 50",
+        'low_score_students = student_df[student_df["Score"] < 60].shape[0]',
+        'low_score_students = student_df[student_df["Score"] < 50].shape[0]',
+        1,
+    ),
+    (
         "empty-guard removed: metrics report NaN instead of 0 on an empty result",
         "    if len(filtered_df) > 0:\n        average_score = filtered_df[\"Score\"].mean()",
         "    if True:\n        average_score = filtered_df[\"Score\"].mean()",

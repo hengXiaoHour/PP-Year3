@@ -218,6 +218,35 @@ eq("page_title is the Lab 02 title", literal(cfg.get("page_title")), "EduRisk An
 eq("layout is wide", literal(cfg.get("layout")), "wide")
 eq("page_icon is the graduation cap", literal(cfg.get("page_icon")), "\U0001f393")
 
+# ---- Lab 01 continuity -------------------------------------------------
+# The teacher requires Lab 02 to BUILD ON Lab 01, so the two Lab 01 features
+# that the sheet's "replace your old ..." wording would have dropped must still
+# be present. These checks exist so they cannot silently disappear again.
+at2 = AppTest.from_file(str(APP), default_timeout=TIMEOUT)
+at2.run()
+check("Lab 01: 'Click Me' button still on the Home page",
+      any(b.label == "Click Me" for b in at2.button),
+      f"buttons={[b.label for b in at2.button]}")
+# exact match, not substring: the Home page always contains "Welcome to Lab 02."
+check("Lab 01: button shows nothing before it is clicked",
+      not any(str(m.value).strip() == "Welcome" for m in at2.markdown),
+      f"markdown={[str(m.value) for m in at2.markdown]}")
+at2.button[0].click().run()
+check("Lab 01: 'Click Me' still writes Welcome when clicked",
+      any(str(m.value).strip() == "Welcome" for m in at2.markdown),
+      f"markdown={[str(m.value) for m in at2.markdown]}")
+
+at2 = fresh("Student Data")
+mm2 = metric_map(at2)
+eq("Lab 01: 'Low Score Students' metric still present",
+   mm2.get("Low Score Students"),
+   str(int((ORACLE["Score"] < 60).sum())))
+check("Lab 01: the Lab 02 metric row is untouched (4 tiles)",
+      mm2.get("Total Students") == "8" and mm2.get("High Risk Students") == "2")
+check("Lab 01: 'From Lab 01' section header present",
+      any(s.value == "From Lab 01" for s in at2.subheader),
+      f"subheaders={[s.value for s in at2.subheader]}")
+
 # ---------------------------------------------------------------- 2. Student Data
 at = fresh("Student Data")
 mm = metric_map(at)
