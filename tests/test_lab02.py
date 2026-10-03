@@ -207,6 +207,9 @@ eq("sidebar has the 5 Lab 02 pages in order",
    at.sidebar.radio[0].options,
    ["Home", "Dashboard", "Student Data", "Risk Checker", "About"])
 eq("sidebar defaults to Home", at.sidebar.radio[0].value, "Home")
+check("sidebar label is collapsed (the title already says it)",
+      "COLLAPSED" in str(at.sidebar.radio[0].label_visibility),
+      str(at.sidebar.radio[0].label_visibility))
 
 # set_page_config cannot be observed through AppTest (Streamlit does not put it
 # in the element tree), so assert it against the AST: it must be the FIRST
@@ -252,7 +255,7 @@ eq("Lab 01: 'Low Score Students' metric still present",
    mm2.get("Low Score Students"),
    str(int((ORACLE["Score"] < 60).sum())))
 check("Lab 01: the Lab 02 metric row is untouched (4 tiles)",
-      mm2.get("Total Students") == "8" and mm2.get("High Risk Students") == "2")
+      mm2.get("Students") == "8" and mm2.get("High Risk") == "2")
 check("Lab 01: 'From Lab 01' section header present",
       any(s.value == "From Lab 01" for s in at2.subheader),
       f"subheaders={[s.value for s in at2.subheader]}")
@@ -260,17 +263,19 @@ check("Lab 01: 'From Lab 01' section header present",
 # ---------------------------------------------------------------- 2. Student Data
 at = fresh("Student Data")
 mm = metric_map(at)
-# Lab 02 Step 31 states these four expected metrics.
-eq("Student Data: Total Students (sheet)", mm.get("Total Students"), "8")
-eq("Student Data: Average Score (sheet)", mm.get("Average Score"), "71.62")
-eq("Student Data: Average Attendance (sheet)", mm.get("Average Attendance"), "79.0%")
-eq("Student Data: High Risk Students (sheet)", mm.get("High Risk Students"), "2")
+# Metric values follow the Lab 02 sheet (Step 31: 8 students, 2 high risk),
+# but the labels are unified to the short form on both pages and both averages
+# use 1 decimal, so the two pages read as one design.
+eq("Student Data: Students", mm.get("Students"), "8")
+eq("Student Data: Average Score", mm.get("Average Score"), "71.6")
+eq("Student Data: Average Attendance", mm.get("Average Attendance"), "79.0%")
+eq("Student Data: High Risk", mm.get("High Risk"), "2")
 f = frame(at)
 check("Student Data: full dataset rendered", f is not None)
 eq("Student Data: 8 rows", 0 if f is None else len(f), 8)
 eq("Student Data: Risk Level column present", None if f is None else "Risk Level" in f.columns, True)
 eq("Student Data: metric values match oracle",
-   (mm.get("Total Students"), mm.get("High Risk Students")),
+   (mm.get("Students"), mm.get("High Risk")),
    (str(len(ORACLE)), str(int((ORACLE["Risk Level"] == "High Risk").sum()))))
 
 # risk column must equal the Step 10 table from the instruction sheet
@@ -282,8 +287,8 @@ at = fresh("Dashboard")
 mm = metric_map(at)
 eq("Dashboard: metrics use the Students/High Risk labels",
    (mm.get("Students"), mm.get("High Risk")), ("8", "2"))
-eq("Dashboard: Average Score (sheet)", mm.get("Average Score"), "71.62")
-eq("Dashboard: Average Attendance (sheet)", mm.get("Average Attendance"), "79.0%")
+eq("Dashboard: Average Score", mm.get("Average Score"), "71.6")
+eq("Dashboard: Average Attendance", mm.get("Average Attendance"), "79.0%")
 eq("Dashboard: default table shows all 8", len(frame(at)), 8)
 eq("Dashboard: course filter options",
    at.selectbox[0].options, ["All", "Python", "Statistics", "Database", "Web App"])
@@ -429,7 +434,14 @@ for who, score, att, want, kind in CASES:
     eq(f"{who}: shows exactly one risk message", len(got), 1)
     eq(f"{who}: message text", got, [f"Risk Level: {want}"])
     eq(f"{who}: uses the {kind} element", len(msgs(kind, at)), 1)
-    eq(f"{who}: echoes the entered name", who in body_of(at), True)
+    # the form no longer echoes the inputs back: the user just typed them,
+    # so the only output is the result message itself. (The VISWA_CSS theme
+    # block also renders as a Markdown element, so it is excluded here.)
+    eq(f"{who}: shows nothing but the result",
+       [m.value for m in at.markdown
+        if str(m.value).strip()
+        and "Risk Level" not in str(m.value)
+        and not str(m.value).lstrip().startswith("<style")], [])
 
 at = fresh("Risk Checker")
 eq("Risk Checker form has 1 text + 2 number inputs",

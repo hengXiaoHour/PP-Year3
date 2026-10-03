@@ -191,8 +191,13 @@ a { color: var(--v-red) !important; }
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- PRIMARY ACTION: solid red, white type (robot UI .control-btn) ---- */
-.stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {
+/* ---- ACTIONS: primary is solid red, secondary is ghost -----------------
+   Follows the robot UI split (.control-btn vs .control-btn.secondary): only
+   one red action per view. The button kind comes from Streamlit's
+   type="primary" parameter, which renders as kind="primary" in the DOM. */
+.stButton > button[kind="primary"],
+.stDownloadButton > button[kind="primary"],
+.stFormSubmitButton > button[kind="primary"] {
   background-color: var(--v-red) !important;
   color: var(--v-white) !important;
   border: 1px solid var(--v-red) !important;
@@ -204,9 +209,31 @@ a { color: var(--v-red) !important; }
   text-transform: uppercase !important;
   padding: 9px 18px !important;
 }
-.stButton > button:hover, .stDownloadButton > button:hover, .stFormSubmitButton > button:hover {
+.stButton > button[kind="primary"]:hover,
+.stDownloadButton > button[kind="primary"]:hover,
+.stFormSubmitButton > button[kind="primary"]:hover {
   background-color: var(--v-red-hot) !important;
   border-color: var(--v-red-hot) !important;
+  color: var(--v-white) !important;
+}
+.stButton > button[kind="secondary"],
+.stDownloadButton > button[kind="secondary"],
+.stFormSubmitButton > button[kind="secondary"] {
+  background-color: transparent !important;
+  color: var(--v-white-80) !important;
+  border: 1px solid var(--v-white-30) !important;
+  border-radius: 0 !important;
+  font-family: var(--v-font-mono) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  padding: 9px 18px !important;
+}
+.stButton > button[kind="secondary"]:hover,
+.stDownloadButton > button[kind="secondary"]:hover,
+.stFormSubmitButton > button[kind="secondary"]:hover {
+  border-color: var(--v-white) !important;
   color: var(--v-white) !important;
 }
 
@@ -291,6 +318,10 @@ div[data-baseweb="notification"][kind="error"] { border-left-color: var(--v-red)
   border-color: transparent !important;
 }
 [data-testid="stVegaLiteChart"] .vega-bindings { padding: 0 !important; }
+/* gridlines sit one step below the axis labels so the bars carry the view */
+[data-testid="stVegaLiteChart"] .role-axis-grid line {
+  stroke: rgba(255, 255, 255, 0.22) !important;
+}
 
 /* ---- SCROLLBARS: thin black track, white thumb, red on hover -------- */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
@@ -335,14 +366,14 @@ with st.sidebar:
     st.title("EduRisk Menu")
     selected_page = st.radio(
         "Select Page",
-        ["Home", "Dashboard", "Student Data", "Risk Checker", "About"]
+        ["Home", "Dashboard", "Student Data", "Risk Checker", "About"],
+        label_visibility="collapsed"
     )
 
 if selected_page == "Home":
     st.title("EduRisk Analytics")
     st.subheader("Interactive Student Risk Monitoring Dashboard")
     st.write("Welcome to Lab 02.")
-    st.write("In this lab, you will use Streamlit widgets to explore student performance data.")
     st.success("Lab 02 app is running successfully!")
 
     # Carried over from Lab 01.
@@ -354,29 +385,37 @@ elif selected_page == "Dashboard":
 
     st.write("Use the filters below to explore student performance.")
 
-    selected_course = st.selectbox(
-        "Select Course",
-        ["All"] + list(student_df["Course"].unique())
-    )
+    filter_col1, filter_col2 = st.columns(2)
 
-    selected_risk = st.selectbox(
-        "Select Risk Level",
-        ["All", "Low Risk", "Medium Risk", "High Risk"]
-    )
+    with filter_col1:
+        selected_course = st.selectbox(
+            "Select Course",
+            ["All"] + list(student_df["Course"].unique())
+        )
 
-    min_attendance = st.slider(
-        "Minimum Attendance",
-        0,
-        100,
-        0
-    )
+    with filter_col2:
+        selected_risk = st.selectbox(
+            "Select Risk Level",
+            ["All", "Low Risk", "Medium Risk", "High Risk"]
+        )
 
-    min_score = st.slider(
-        "Minimum Score",
-        0,
-        100,
-        0
-    )
+    slider_col1, slider_col2 = st.columns(2)
+
+    with slider_col1:
+        min_attendance = st.slider(
+            "Minimum Attendance",
+            0,
+            100,
+            0
+        )
+
+    with slider_col2:
+        min_score = st.slider(
+            "Minimum Score",
+            0,
+            100,
+            0
+        )
 
     filtered_df = student_df.copy()
 
@@ -415,10 +454,10 @@ elif selected_page == "Dashboard":
         st.metric("Students", total_students)
 
     with col2:
-        st.metric("Average Score", round(average_score, 2))
+        st.metric("Average Score", round(average_score, 1))
 
     with col3:
-        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")
+        st.metric("Average Attendance", f"{round(average_attendance, 1)}%")
 
     with col4:
         st.metric("High Risk", high_risk_students)
@@ -435,7 +474,8 @@ elif selected_page == "Dashboard":
             label="Download Filtered Data",
             data=csv,
             file_name="filtered_student_data.csv",
-            mime="text/csv"
+            mime="text/csv",
+            type="primary"
         )
     else:
         st.info("Filtered dataset is hidden.")
@@ -449,7 +489,7 @@ elif selected_page == "Dashboard":
 
         if len(filtered_df) > 0:
             score_chart = filtered_df.set_index("Student Name")["Score"]
-            st.bar_chart(score_chart, color="#CC0000")
+            st.bar_chart(score_chart, color="rgba(255, 255, 255, 0.55)")
         else:
             st.warning("No data available for score chart.")
 
@@ -475,16 +515,16 @@ elif selected_page == "Student Data":
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("Total Students", total_students)
+        st.metric("Students", total_students)
 
     with col2:
-        st.metric("Average Score", round(average_score, 2))
+        st.metric("Average Score", round(average_score, 1))
 
     with col3:
-        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")
+        st.metric("Average Attendance", f"{round(average_attendance, 1)}%")
 
     with col4:
-        st.metric("High Risk Students", high_risk_students)
+        st.metric("High Risk", high_risk_students)
 
     st.subheader("Full Student Dataset")
     st.dataframe(student_df)
@@ -507,14 +547,10 @@ elif selected_page == "Risk Checker":
         input_name = st.text_input("Student Name")
         input_score = st.number_input("Score", 0, 100, 50)
         input_attendance = st.number_input("Attendance", 0, 100, 50)
-        submitted = st.form_submit_button("Check Risk")
+        submitted = st.form_submit_button("Check Risk", type="primary")
 
     if submitted:
         risk_result = get_risk_level(input_score, input_attendance)
-
-        st.write("Student Name:", input_name)
-        st.write("Score:", input_score)
-        st.write("Attendance:", input_attendance)
 
         if risk_result == "Low Risk":
             st.success("Risk Level: Low Risk")

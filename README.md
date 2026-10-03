@@ -42,6 +42,7 @@ Lab 02 adds to that: the Risk Level rule, the Dashboard page with filters and ch
 - Download filtered data as CSV
 - Ethics reminder
 - Lab 01 features retained: Click Me button, Low Score Students metric
+- Signature black, white and red theme with dot-matrix depth
 
 ## Tools Used
 

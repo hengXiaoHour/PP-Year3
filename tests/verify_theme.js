@@ -63,6 +63,7 @@ function classify(str) {
       subSize: sub && cs(sub).fontSize,
       subPadLeft: sub && cs(sub).paddingLeft,
       btnBg: btn && cs(btn).backgroundColor,
+      btnBorder: btn && cs(btn).borderTopColor,
       btnColor: btn && cs(btn).color,
       btnTransform: btn && cs(btn).textTransform,
       sideBorder: (() => { const s = g('[data-testid="stSidebar"]'); return s && cs(s).borderRightColor; })(),
@@ -107,10 +108,32 @@ function classify(str) {
   });
   console.log('--- DASHBOARD metric plate ---');
   console.log(JSON.stringify(metric, null, 2));
+  const charts = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('[data-testid="stVegaLiteChart"]').forEach((c) => {
+      const bars = [...c.querySelectorAll('[role="graphics-symbol"]')]
+        .map((m) => getComputedStyle(m).fill);
+      const grid = c.querySelector('.role-axis-grid line');
+      out.push({
+        bars: [...new Set(bars)],
+        grid: grid ? getComputedStyle(grid).stroke : null,
+      });
+    });
+    return out;
+  });
+  console.log('--- DASHBOARD charts ---');
+  console.log(JSON.stringify(charts, null, 2));
   await shoot('02-dashboard');
 
   await page.getByTestId('stSidebar').getByText('Risk Checker', { exact: true }).click();
   await page.waitForTimeout(2500);
+  const submit = await page.evaluate(() => {
+    const b = document.querySelector('.stFormSubmitButton > button');
+    return b ? { bg: getComputedStyle(b).backgroundColor,
+                 kind: b.getAttribute('kind') } : null;
+  });
+  console.log('--- RISK CHECKER submit ---');
+  console.log(JSON.stringify(submit));
   await shoot('03-risk-checker');
 
   const bodyText = await page.evaluate(() => document.body.innerText);
@@ -139,10 +162,19 @@ function classify(str) {
   ok('section head is 11px mono', home.subSize, '11px');
   ok('section head text clears the red rule (>=10px padding)',
     parseFloat(home.subPadLeft) >= 10, true);
-  ok('button fill is red', classify(home.btnBg).kind, 'red');
-  ok('button text is white', classify(home.btnColor).kind, 'white');
-  ok('button is uppercased', home.btnTransform, 'uppercase');
+  ok('Click Me text is white', classify(home.btnColor).kind, 'white');
+  ok('Click Me is uppercased', home.btnTransform, 'uppercase');
   ok('sidebar divider is white-alpha', classify(home.sideBorder).kind, 'white');
+  // Home's only button is the secondary Click Me: ghost, not red.
+  ok('secondary Click Me is transparent (ghost)', home.btnBg, 'rgba(0, 0, 0, 0)');
+  ok('ghost button border is white-alpha', classify(home.btnBorder).kind, 'white');
+  ok('primary Check Risk is solid red', submit && classify(submit.bg).kind, 'red');
+  ok('score chart bars are white, not red', charts[0] &&
+    charts[0].bars.some((b) => classify(b).kind === 'white') &&
+    charts[0].bars.every((b) => classify(b).kind !== 'red'), true);
+  ok('risk chart bars are red', charts[1] &&
+    charts[1].bars.map(classify).some((k) => k.kind === 'red'), true);
+  ok('chart gridlines are soft (0.22)', charts[0] && charts[0].grid, 'rgba(255, 255, 255, 0.22)');
   ok('metric plate is black/white alpha', classify(metric.bg).kind, 'white');
   ok('metric plate has dot texture + ticks', metric.dots, 9);
   ok('metric label is white-alpha', classify(metric.label).kind, 'white');

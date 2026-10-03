@@ -79,22 +79,22 @@ MUTANTS: list[tuple[str, str, str, int]] = [
     ),
     (
         "metrics: Dashboard Average Score rounding dropped",
-        'st.metric("Average Score", round(average_score, 2))\n\n    with col3:'
-        '\n        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")\n\n'
-        '    with col4:\n        st.metric("High Risk", high_risk_students)',
-        'st.metric("Average Score", average_score)\n\n    with col3:'
-        '\n        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")\n\n'
-        '    with col4:\n        st.metric("High Risk", high_risk_students)',
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Students", total_students)\n\n    with col2:\n'
+        '        st.metric("Average Score", round(average_score, 1))',
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Students", total_students)\n\n    with col2:\n'
+        '        st.metric("Average Score", average_score)',
         1,
     ),
     (
         "metrics: Student Data Average Score rounding dropped",
-        'st.metric("Average Score", round(average_score, 2))\n\n    with col3:'
-        '\n        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")\n\n'
-        '    with col4:\n        st.metric("High Risk Students", high_risk_students)',
-        'st.metric("Average Score", average_score)\n\n    with col3:'
-        '\n        st.metric("Average Attendance", f"{round(average_attendance, 2)}%")\n\n'
-        '    with col4:\n        st.metric("High Risk Students", high_risk_students)',
+        '    with col2:\n        st.metric("Average Score", round(average_score, 1))\n\n    with col3:\n'
+        '        st.metric("Average Attendance", f"{round(average_attendance, 1)}%")\n\n    with col4:\n'
+        '        st.metric("High Risk", high_risk_students)\n\n    st.subheader("Full Student Dataset")',
+        '    with col2:\n        st.metric("Average Score", average_score)\n\n    with col3:\n'
+        '        st.metric("Average Attendance", f"{round(average_attendance, 1)}%")\n\n    with col4:\n'
+        '        st.metric("High Risk", high_risk_students)\n\n    st.subheader("Full Student Dataset")',
         1,
     ),
     (
@@ -166,7 +166,7 @@ MUTANTS: list[tuple[str, str, str, int]] = [
     ),
     (
         "theme: charts go back to Streamlit's default blue",
-        'st.bar_chart(score_chart, color="#CC0000")',
+        'st.bar_chart(score_chart, color="rgba(255, 255, 255, 0.55)")',
         "st.bar_chart(score_chart)",
         1,
         "theme",
@@ -178,6 +178,55 @@ MUTANTS: list[tuple[str, str, str, int]] = [
         "    radial-gradient(var(--v-white-16) 1px, transparent 1.4px);\n"
         "  background-size: 66px 66px, 22px 22px, 11px 11px;",
         "  background-image: none;\n  background-size: auto;",
+        1,
+        "theme",
+    ),
+    (
+        "minimal: Dashboard label drifts back to 'Total Students'",
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Students", total_students)',
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Total Students", total_students)',
+        1,
+    ),
+    (
+        "minimal: Dashboard Average Score goes back to 2 decimals",
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Students", total_students)\n\n    with col2:\n'
+        '        st.metric("Average Score", round(average_score, 1))',
+        '    st.subheader("Dashboard Metrics")\n\n    col1, col2, col3, col4 = st.columns(4)\n\n'
+        '    with col1:\n        st.metric("Students", total_students)\n\n    with col2:\n'
+        '        st.metric("Average Score", round(average_score, 2))',
+        1,
+    ),
+    (
+        "minimal: Risk Checker echoes the inputs again",
+        "        risk_result = get_risk_level(input_score, input_attendance)\n\n        if risk_result",
+        "        risk_result = get_risk_level(input_score, input_attendance)\n\n"
+        '        st.write("Student Name:", input_name)\n        st.write("Score:", input_score)\n'
+        '        st.write("Attendance:", input_attendance)\n\n        if risk_result',
+        1,
+    ),
+    (
+        "minimal: sidebar label is visible again",
+        '        ["Home", "Dashboard", "Student Data", "Risk Checker", "About"],\n'
+        '        label_visibility="collapsed"\n',
+        '        ["Home", "Dashboard", "Student Data", "Risk Checker", "About"]\n',
+        1,
+    ),
+    (
+        "minimal: Click Me becomes a red primary button",
+        '    if st.button("Click Me"):',
+        '    if st.button("Click Me", type="primary"):',
+        1,
+        "theme",
+    ),
+    (
+        "minimal: chart gridlines go back to loud white-55",
+        '[data-testid="stVegaLiteChart"] .role-axis-grid line {\n'
+        "  stroke: rgba(255, 255, 255, 0.22) !important;\n}",
+        '[data-testid="stVegaLiteChart"] .role-axis-grid line {\n'
+        "  stroke: rgba(255, 255, 255, 0.55) !important;\n}",
         1,
         "theme",
     ),
