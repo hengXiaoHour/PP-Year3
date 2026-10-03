@@ -28,6 +28,10 @@ student_df["Risk Level"] = student_df.apply(
     axis=1
 )
 
+# Carried over from Lab 01: the raw "score below 60" count, kept alongside the
+# Lab 02 Risk Level so nothing from Lab 01 is lost.
+low_score_students = student_df[student_df["Score"] < 60].shape[0]
+
 with st.sidebar:
     st.title("EduRisk Menu")
     selected_page = st.radio(
@@ -41,6 +45,10 @@ if selected_page == "Home":
     st.write("Welcome to Lab 02.")
     st.write("In this lab, you will use Streamlit widgets to explore student performance data.")
     st.success("Lab 02 app is running successfully!")
+
+    # Carried over from Lab 01.
+    if st.button("Click Me"):
+        st.write("Welcome")
 
 elif selected_page == "Dashboard":
     st.title("Interactive Dashboard")
@@ -181,6 +189,17 @@ elif selected_page == "Student Data":
 
     st.subheader("Full Student Dataset")
     st.dataframe(student_df)
+
+    # Carried over from Lab 01, kept as its own row so the Lab 02 metric row
+    # above stays exactly as the lab sheet defines it.
+    st.subheader("From Lab 01")
+    lab1_col1, lab1_col2 = st.columns(2)
+
+    with lab1_col1:
+        st.metric("Low Score Students", low_score_students)
+
+    with lab1_col2:
+        st.caption("Count of students scoring below 60, carried over from Lab 01.")
 
 elif selected_page == "Risk Checker":
     st.title("Single Student Risk Checker")

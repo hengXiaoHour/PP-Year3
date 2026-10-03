@@ -10,6 +10,18 @@ This Streamlit app is an interactive student risk monitoring dashboard.
 
 This lab continues from Lab 01 and adds filters, charts, risk level calculation, and a risk checker form.
 
+## Continued from Lab 01
+
+This lab is built on top of the Lab 01 app, not restarted from scratch. Everything from Lab 01 is still here:
+
+- The same `EduRiskAnalytics` project and the same virtual environment
+- The sidebar menu and the Home, Student Data and About pages
+- The `Click Me` button on the Home page
+- The `Low Score Students` metric (shown under "From Lab 01" on the Student Data page)
+- Student Information on the About page
+
+Lab 02 adds to that: the Risk Level rule, the Dashboard page with filters and charts, the Risk Checker form, and CSV download.
+
 ## Features
 
 - Sidebar navigation
@@ -29,6 +41,7 @@ This lab continues from Lab 01 and adds filters, charts, risk level calculation,
 - Bar charts
 - Download filtered data as CSV
 - Ethics reminder
+- Lab 01 features retained: Click Me button, Low Score Students metric
 
 ## Tools Used
 
