@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(
-    page_title="EduRisk Analytics - Lab 02",
+    page_title="EduRisk Analytics - Lab 03",
+    page_icon="🎓",
     layout="wide"
 )
 
@@ -337,13 +338,22 @@ footer, [data-testid="stStatusWidget"] { visibility: hidden; }
 </style>
 """
 st.markdown(VISWA_CSS, unsafe_allow_html=True)
-student_df = pd.DataFrame({
-    "Student Name": ["Dara", "Sophea", "Vuthy", "Malis", "Rithy", "Sreyneang", "Chan", "Bopha"],
-    "Course": ["Python", "Statistics", "Python", "Database", "Web App", "Database", "Python", "Statistics"],
-    "Score": [85, 68, 45, 92, 58, 91, 72, 62],
-    "Attendance": [90, 75, 50, 95, 60, 94, 80, 88],
-    "Study Hours": [12, 8, 3, 15, 5, 14, 9, 7]
-})
+
+# Lab 03: the dataset now lives in students.csv beside this file, so the app
+# reads it at runtime instead of carrying a hard-coded DataFrame. The try /
+# except is deliberate: a missing or misnamed file should explain itself in the
+# browser rather than raise a raw FileNotFoundError traceback.
+def load_student_data():
+    try:
+        return pd.read_csv("students.csv")
+    except FileNotFoundError:
+        st.error(
+            "students.csv was not found. Please place it in the same folder as app.py."
+        )
+        st.stop()
+
+
+student_df = load_student_data()
 
 def get_risk_level(score, attendance):
     if score < 60 or attendance < 60:
@@ -372,9 +382,13 @@ with st.sidebar:
 
 if selected_page == "Home":
     st.title("EduRisk Analytics")
-    st.subheader("Interactive Student Risk Monitoring Dashboard")
-    st.write("Welcome to Lab 02.")
-    st.success("Lab 02 app is running successfully!")
+    st.subheader("Frontend Prototype with CSV Data Loading")
+    st.write("Welcome to Lab 03.")
+    st.write(
+        "This app loads student data from students.csv using Pandas "
+        "instead of storing data directly inside app.py."
+    )
+    st.success("Lab 03 app is running successfully!")
 
     # Carried over from Lab 01.
     if st.button("Click Me"):
@@ -502,8 +516,39 @@ elif selected_page == "Dashboard":
         else:
             st.warning("No data available for risk chart.")
 
+    # Added in Lab 03: the course mix, so a reader can see the cohort shape
+    # rather than only performance. Filter-aware, like the two charts above.
+    st.write("Course Count")
+
+    if len(filtered_df) > 0:
+        course_count = filtered_df["Course"].value_counts()
+        st.bar_chart(course_count, color="rgba(255, 255, 255, 0.55)")
+    else:
+        st.warning("No data available for course chart.")
+
+    st.info(
+        "Ethics Reminder: Academic monitoring should support students, "
+        "not label or punish them."
+    )
+
 elif selected_page == "Student Data":
     st.title("Student Data")
+
+    st.write(
+        "This page displays and inspects the dataset loaded from students.csv."
+    )
+
+    # Added in Lab 03: inspect the loaded data before trusting it. The shape
+    # reads (8, 6) because the Risk Level column is added after the CSV load.
+    st.subheader("Data Inspection")
+
+    st.write("Rows and Columns:", student_df.shape)
+
+    st.write("Column Names:")
+    st.write(student_df.columns.tolist())
+
+    st.write("First 5 Rows:")
+    st.dataframe(student_df.head())
 
     total_students = len(student_df)
     average_score = student_df["Score"].mean()
@@ -561,11 +606,18 @@ elif selected_page == "Risk Checker":
 
 else:
     st.title("About")
-    st.write("This app is part of Lab 02.")
+    st.write("This app is part of Lab 03.")
     st.write("Course: Web App Development for Data Science")
     st.write("Project Theme: EduRisk Analytics")
-    st.write("Topic: Streamlit Interactive Dashboard")
-    st.info("Ethics Reminder: Risk prediction should support students, not punish them.")
+    st.write("Topic: Data Loading, Layout, and Frontend Prototype")
+    st.info(
+        "This frontend prototype loads real data from students.csv "
+        "and displays it using Streamlit and Pandas."
+    )
+    st.warning(
+        "Ethics Reminder: Student risk information should be used responsibly "
+        "to support learning and student success."
+    )
 
     st.subheader("Student Information")
     st.write("Name: Heng Hour")

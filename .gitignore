@@ -2,3 +2,8 @@
 __pycache__/
 *.pyc
 .streamlit/
+
+# Lab 03 submission hygiene: the dashboard's download button writes this file,
+# and the lab sheet says it must never be submitted. It is a build artefact,
+# not source, so it stays out of git as well as out of the zip.
+filtered_student_data.csv
