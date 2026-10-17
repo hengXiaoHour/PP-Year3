@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- VISWA theme ---------------------------------------------------------
+# --- App theme -----------------------------------------------------------
 # Exactly three colours: black, white, red. Every other tone in this file is
 # black or white with an alpha channel, which is how the balancing-robot UI
 # creates depth instead of inventing more greys.
@@ -18,26 +18,26 @@ st.set_page_config(
 # The CSS lives inside app.py on purpose: the lab submission is exactly
 # app.py, requirements.txt and README.md, so a .streamlit/config.toml could not
 # ship with it.
-VISWA_CSS = """
+THEME_CSS = """
 <style>
 :root {
-  --v-black: #000000;
-  --v-white: #FFFFFF;
-  --v-red:   #CC0000;
-  --v-red-hot: #FF0A0A;
-  --v-white-06: rgba(255, 255, 255, 0.06);
-  --v-white-10: rgba(255, 255, 255, 0.10);
-  --v-white-16: rgba(255, 255, 255, 0.16);
-  --v-white-30: rgba(255, 255, 255, 0.30);
-  --v-white-55: rgba(255, 255, 255, 0.55);
-  --v-white-80: rgba(255, 255, 255, 0.80);
-  --v-font-display: 'Oswald', 'Anton', 'Arial Narrow', 'DejaVu Sans Condensed', sans-serif;
-  --v-font-mono: 'JetBrains Mono', 'Space Mono', 'DejaVu Sans Mono', monospace;
+  --t-black: #000000;
+  --t-white: #FFFFFF;
+  --t-red:   #CC0000;
+  --t-red-hot: #FF0A0A;
+  --t-white-06: rgba(255, 255, 255, 0.06);
+  --t-white-10: rgba(255, 255, 255, 0.10);
+  --t-white-16: rgba(255, 255, 255, 0.16);
+  --t-white-30: rgba(255, 255, 255, 0.30);
+  --t-white-55: rgba(255, 255, 255, 0.55);
+  --t-white-80: rgba(255, 255, 255, 0.80);
+  --t-font-display: 'Oswald', 'Anton', 'Arial Narrow', 'DejaVu Sans Condensed', sans-serif;
+  --t-font-mono: 'JetBrains Mono', 'Space Mono', 'DejaVu Sans Mono', monospace;
 }
 html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-  background-color: var(--v-black) !important;
-  color: var(--v-white);
-  font-family: var(--v-font-mono);
+  background-color: var(--t-black) !important;
+  color: var(--t-white);
+  font-family: var(--t-font-mono);
 }
 
 /* ---- DEPTH: three stacked dot fields ---------------------------------
@@ -51,9 +51,9 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"]
   z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(var(--v-white-06) 1px, transparent 1.5px),
-    radial-gradient(var(--v-white-10) 1px, transparent 1.5px),
-    radial-gradient(var(--v-white-16) 1px, transparent 1.4px);
+    radial-gradient(var(--t-white-06) 1px, transparent 1.5px),
+    radial-gradient(var(--t-white-10) 1px, transparent 1.5px),
+    radial-gradient(var(--t-white-16) 1px, transparent 1.4px);
   background-size: 66px 66px, 22px 22px, 11px 11px;
   background-position: 0 0, 0 0, 0 0;
   -webkit-mask-image: radial-gradient(ellipse 130% 105% at 50% -10%, black 30%, transparent 92%);
@@ -79,16 +79,16 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"]
    sets a specific colour uses !important and therefore wins. */
 .stApp, .stApp *,
 [data-testid="stSidebar"], [data-testid="stSidebar"] * {
-  color: var(--v-white-80);
-  border-color: var(--v-white-16);
+  color: var(--t-white-80);
+  border-color: var(--t-white-16);
 }
 [data-testid="stAlertContainer"] {
   background-color: transparent !important;
-  color: var(--v-white-80) !important;
+  color: var(--t-white-80) !important;
   border-color: transparent !important;
 }
 [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] {
-  color: var(--v-white-55) !important;
+  color: var(--t-white-55) !important;
 }
 /* the little "**" tooltip icons beside widget labels paint with
    stroke="currentColor", so their inherited COLOUR is what leaks Streamlit's
@@ -96,60 +96,60 @@ html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"]
 [data-testid="stHeaderActionElements"] a,
 [data-testid="stWidgetLabel"] a,
 [data-testid="stHeaderActionElements"] svg {
-  color: var(--v-white-55) !important;
+  color: var(--t-white-55) !important;
 }
 /* Streamlit sets stroke explicitly on those icons, so colour alone is not
    enough. Scoped to svg elements that actually have a stroke attribute, so
    icons declared stroke="none" stay invisible. */
 [data-testid="stHeaderActionElements"] svg[stroke]:not([stroke="none"]) {
-  stroke: var(--v-white-55) !important;
+  stroke: var(--t-white-55) !important;
 }
 svg path, svg circle, svg rect, svg line, svg polyline, svg polygon {
-  stroke: var(--v-white-55) !important;
+  stroke: var(--t-white-55) !important;
 }
-[data-baseweb="notification"] svg { stroke: var(--v-white-80) !important; fill: var(--v-white-80) !important; }
+[data-baseweb="notification"] svg { stroke: var(--t-white-80) !important; fill: var(--t-white-80) !important; }
 a, a:any-link, [data-testid="stLink"] a {
-  color: var(--v-red) !important;
-  text-decoration-color: var(--v-red) !important;
+  color: var(--t-red) !important;
+  text-decoration-color: var(--t-red) !important;
 }
-input, textarea, select, button { font-family: var(--v-font-mono) !important; }
+input, textarea, select, button { font-family: var(--t-font-mono) !important; }
 
 /* ---- TYPE -------------------------------------------------------------- */
-h1, h2, h3, h4, h5, h6 { font-family: var(--v-font-mono) !important; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--t-font-mono) !important; }
 h1 {
-  color: var(--v-white) !important;
+  color: var(--t-white) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.10em !important;
   font-weight: 700 !important;
 }
 /* section heads: micro mono caps, white at 55%, with the red spine */
 h2, h3, h4 {
-  color: var(--v-white-55) !important;
+  color: var(--t-white-55) !important;
   font-size: 11px !important;
   letter-spacing: 0.24em !important;
   text-transform: uppercase !important;
   font-weight: 700 !important;
-  border-left: 2px solid var(--v-red) !important;
+  border-left: 2px solid var(--t-red) !important;
   padding-left: 12px !important;
   margin-top: 6px !important;
 }
-p, label, span, div, li, td { color: var(--v-white-80); }
-a { color: var(--v-red) !important; }
+p, label, span, div, li, td { color: var(--t-white-80); }
+a { color: var(--t-red) !important; }
 
 /* ---- SIDEBAR: a recessed well, not a panel --------------------------- */
 [data-testid="stSidebar"] {
-  background-color: var(--v-black) !important;
-  border-right: 1px solid var(--v-white-10);
+  background-color: var(--t-black) !important;
+  border-right: 1px solid var(--t-white-10);
 }
-[data-testid="stSidebar"] * { color: var(--v-white-80) !important; }
+[data-testid="stSidebar"] * { color: var(--t-white-80) !important; }
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
   border-left: none !important;
   padding-left: 0 !important;
-  color: var(--v-white) !important;
+  color: var(--t-white) !important;
   letter-spacing: 0.14em !important;
   font-size: 13px !important;
 }
-[data-testid="stSidebar"] h1 { border-bottom: 2px solid var(--v-red); padding-bottom: 6px !important; }
+[data-testid="stSidebar"] h1 { border-bottom: 2px solid var(--t-red); padding-bottom: 6px !important; }
 [data-testid="stSidebar"] label p {
   font-size: 11px !important;
   letter-spacing: 0.14em !important;
@@ -160,34 +160,34 @@ a { color: var(--v-red) !important; }
 [data-testid="stMetric"] {
   background-color: rgba(255, 255, 255, 0.04) !important;
   background-image:
-    radial-gradient(var(--v-white-06) 1px, transparent 1.5px),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30)),
-    linear-gradient(var(--v-white-30), var(--v-white-30));
+    radial-gradient(var(--t-white-06) 1px, transparent 1.5px),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30)),
+    linear-gradient(var(--t-white-30), var(--t-white-30));
   background-size: 11px 11px, 14px 2px, 2px 14px, 14px 2px, 2px 14px, 14px 2px, 2px 14px, 14px 2px, 2px 14px;
   background-position: 0 0, -1px -1px, -1px -1px, calc(100% + 1px) -1px, calc(100% + 1px) -1px,
     -1px calc(100% + 1px), -1px calc(100% + 1px), calc(100% + 1px) calc(100% + 1px), calc(100% + 1px) calc(100% + 1px);
   background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  border: 1px solid var(--v-white-16);
+  border: 1px solid var(--t-white-16);
   border-radius: 0 !important;
   padding: 16px 14px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 }
 [data-testid="stMetricLabel"] {
-  color: var(--v-white-55) !important;
-  font-family: var(--v-font-mono) !important;
+  color: var(--t-white-55) !important;
+  font-family: var(--t-font-mono) !important;
   font-size: 10px !important;
   letter-spacing: 0.22em !important;
   text-transform: uppercase !important;
 }
 [data-testid="stMetricValue"] {
-  color: var(--v-white) !important;
-  font-family: var(--v-font-mono) !important;
+  color: var(--t-white) !important;
+  font-family: var(--t-font-mono) !important;
   font-weight: 700 !important;
   font-variant-numeric: tabular-nums;
 }
@@ -199,11 +199,11 @@ a { color: var(--v-red) !important; }
 .stButton > button[kind="primary"],
 .stDownloadButton > button[kind="primary"],
 .stFormSubmitButton > button[kind="primary"] {
-  background-color: var(--v-red) !important;
-  color: var(--v-white) !important;
-  border: 1px solid var(--v-red) !important;
+  background-color: var(--t-red) !important;
+  color: var(--t-white) !important;
+  border: 1px solid var(--t-red) !important;
   border-radius: 0 !important;
-  font-family: var(--v-font-mono) !important;
+  font-family: var(--t-font-mono) !important;
   font-weight: 700 !important;
   font-size: 12px !important;
   letter-spacing: 0.18em !important;
@@ -213,18 +213,18 @@ a { color: var(--v-red) !important; }
 .stButton > button[kind="primary"]:hover,
 .stDownloadButton > button[kind="primary"]:hover,
 .stFormSubmitButton > button[kind="primary"]:hover {
-  background-color: var(--v-red-hot) !important;
-  border-color: var(--v-red-hot) !important;
-  color: var(--v-white) !important;
+  background-color: var(--t-red-hot) !important;
+  border-color: var(--t-red-hot) !important;
+  color: var(--t-white) !important;
 }
 .stButton > button[kind="secondary"],
 .stDownloadButton > button[kind="secondary"],
 .stFormSubmitButton > button[kind="secondary"] {
   background-color: transparent !important;
-  color: var(--v-white-80) !important;
-  border: 1px solid var(--v-white-30) !important;
+  color: var(--t-white-80) !important;
+  border: 1px solid var(--t-white-30) !important;
   border-radius: 0 !important;
-  font-family: var(--v-font-mono) !important;
+  font-family: var(--t-font-mono) !important;
   font-weight: 700 !important;
   font-size: 12px !important;
   letter-spacing: 0.18em !important;
@@ -234,8 +234,8 @@ a { color: var(--v-red) !important; }
 .stButton > button[kind="secondary"]:hover,
 .stDownloadButton > button[kind="secondary"]:hover,
 .stFormSubmitButton > button[kind="secondary"]:hover {
-  border-color: var(--v-white) !important;
-  color: var(--v-white) !important;
+  border-color: var(--t-white) !important;
+  color: var(--t-white) !important;
 }
 
 /* ---- INPUTS: recessed (darker than the field, not lighter) ----------- */
@@ -243,49 +243,49 @@ a { color: var(--v-red) !important; }
 [data-baseweb="input"],
 [data-testid="stNumberInput"] input,
 [data-testid="stTextInput"] input {
-  background-color: var(--v-black) !important;
-  border: 1px solid var(--v-white-16) !important;
+  background-color: var(--t-black) !important;
+  border: 1px solid var(--t-white-16) !important;
   border-radius: 0 !important;
-  color: var(--v-white) !important;
-  font-family: var(--v-font-mono) !important;
+  color: var(--t-white) !important;
+  font-family: var(--t-font-mono) !important;
 }
-[data-baseweb="select"] > div:hover, [data-baseweb="input"]:hover { border-color: var(--v-white-30) !important; }
-[data-baseweb="base-input"] { background-color: var(--v-black) !important; }
-[data-baseweb="popover"] > div, [data-baseweb="menu"] { background-color: var(--v-black) !important; }
+[data-baseweb="select"] > div:hover, [data-baseweb="input"]:hover { border-color: var(--t-white-30) !important; }
+[data-baseweb="base-input"] { background-color: var(--t-black) !important; }
+[data-baseweb="popover"] > div, [data-baseweb="menu"] { background-color: var(--t-black) !important; }
 /* the red is the focus colour, as in the robot UI */
 [data-baseweb="select"] > div:focus-within, [data-baseweb="input"]:focus {
-  border-color: var(--v-red) !important;
+  border-color: var(--t-red) !important;
   box-shadow: none !important;
 }
-[data-testid="stSlider"] [role="slider"] { background-color: var(--v-red) !important; }
+[data-testid="stSlider"] [role="slider"] { background-color: var(--t-red) !important; }
 [data-testid="stSlider"] [data-testid="stTickBarMin"], [data-testid="stSlider"] [data-testid="stTickBarMax"] {
-  color: var(--v-white-55) !important;
+  color: var(--t-white-55) !important;
 }
 [data-testid="stCheckbox"] label, [data-testid="stRadio"] label {
-  font-family: var(--v-font-mono) !important;
+  font-family: var(--t-font-mono) !important;
   font-size: 11px !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
-  color: var(--v-white-80) !important;
+  color: var(--t-white-80) !important;
 }
-[data-baseweb="checkbox"] svg, [data-baseweb="radio"] svg { color: var(--v-red) !important; }
+[data-baseweb="checkbox"] svg, [data-baseweb="radio"] svg { color: var(--t-red) !important; }
 
 /* ---- ALERTS: flat black plate, white type, red only for errors ------- */
 [data-testid="stAlert"] {
   background-color: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid var(--v-white-16) !important;
-  border-left: 3px solid var(--v-white-30) !important;
+  border: 1px solid var(--t-white-16) !important;
+  border-left: 3px solid var(--t-white-30) !important;
   border-radius: 0 !important;
-  color: var(--v-white-80) !important;
+  color: var(--t-white-80) !important;
 }
-[data-testid="stAlert"] * { color: var(--v-white-80) !important; }
+[data-testid="stAlert"] * { color: var(--t-white-80) !important; }
 [data-baseweb="notification"] { background-color: transparent !important; }
-[data-testid="stAlertContainer"] [data-testid="stMarkdownContainer"] p { color: var(--v-white-80) !important; }
-div[data-baseweb="notification"][kind="error"] { border-left-color: var(--v-red) !important; }
+[data-testid="stAlertContainer"] [data-testid="stMarkdownContainer"] p { color: var(--t-white-80) !important; }
+div[data-baseweb="notification"][kind="error"] { border-left-color: var(--t-red) !important; }
 
 /* ---- DATA + CHARTS: recessed wells ----------------------------------- */
 [data-testid="stDataFrame"], [data-testid="stDataFrameResizable"] {
-  border: 1px solid var(--v-white-16) !important;
+  border: 1px solid var(--t-white-16) !important;
   background-color: rgba(255, 255, 255, 0.03) !important;
   border-radius: 0 !important;
 }
@@ -295,7 +295,7 @@ div[data-baseweb="notification"][kind="error"] { border-left-color: var(--v-red)
    Python via st.bar_chart(..., color="#CC0000"). */
 .js-plotly-plot, [data-testid="stVegaChart"], [data-testid="stVegaLiteChart"] {
   background-color: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid var(--v-white-16) !important;
+  border: 1px solid var(--t-white-16) !important;
   border-radius: 0 !important;
   padding: 10px;
 }
@@ -308,14 +308,14 @@ div[data-baseweb="notification"][kind="error"] { border-left-color: var(--v-red)
 /* axis and value labels: Vega's default #808495 grey -> white at 55% */
 [data-testid="stVegaLiteChart"] text,
 [data-testid="stVegaLiteChart"] tspan {
-  fill: var(--v-white-55) !important;
-  font-family: var(--v-font-mono) !important;
+  fill: var(--t-white-55) !important;
+  font-family: var(--t-font-mono) !important;
 }
 /* the vega <form> wrapper carried Streamlit's #31333F */
 [data-testid="stVegaLiteChart"] form,
 [data-testid="stVegaLiteChart"] .vega-bindings,
 [data-testid="stVegaLiteChart"] div {
-  color: var(--v-white-55) !important;
+  color: var(--t-white-55) !important;
   border-color: transparent !important;
 }
 [data-testid="stVegaLiteChart"] .vega-bindings { padding: 0 !important; }
@@ -326,10 +326,10 @@ div[data-baseweb="notification"][kind="error"] { border-left-color: var(--v-red)
 
 /* ---- SCROLLBARS: thin black track, white thumb, red on hover -------- */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-track { background: var(--v-black); }
-::-webkit-scrollbar-thumb { background: var(--v-white-16); }
-::-webkit-scrollbar-thumb:hover { background: var(--v-red); }
-hr { border-color: var(--v-white-10) !important; }
+::-webkit-scrollbar-track { background: var(--t-black); }
+::-webkit-scrollbar-thumb { background: var(--t-white-16); }
+::-webkit-scrollbar-thumb:hover { background: var(--t-red); }
+hr { border-color: var(--t-white-10) !important; }
 /* Streamlit's own footer / status chrome, kept out of the way */
 footer, [data-testid="stStatusWidget"] { visibility: hidden; }
 [data-testid="stDecoration"] { display: none; }
@@ -337,7 +337,7 @@ footer, [data-testid="stStatusWidget"] { visibility: hidden; }
 [data-testid="stAppViewContainer"] * { border-radius: 0 !important; }
 </style>
 """
-st.markdown(VISWA_CSS, unsafe_allow_html=True)
+st.markdown(THEME_CSS, unsafe_allow_html=True)
 
 # Lab 03: the dataset now lives in students.csv beside this file, so the app
 # reads it at runtime instead of carrying a hard-coded DataFrame. The try /
