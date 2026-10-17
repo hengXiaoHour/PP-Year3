@@ -3,6 +3,12 @@ __pycache__/
 *.pyc
 .streamlit/
 
+# The verification harness. The lab sheet does not ask for tests and the
+# submission zip is exactly four files, so this folder is not part of the
+# deliverable. It stays on disk and keeps working locally; it is simply not
+# version-tracked.
+tests/
+
 # Lab 03 submission hygiene: the dashboard's download button writes this file,
 # and the lab sheet says it must never be submitted. It is a build artefact,
 # not source, so it stays out of git as well as out of the zip.
