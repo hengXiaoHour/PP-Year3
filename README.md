@@ -1,4 +1,4 @@
-# Lab 04: Forms, Validation, and Session State
+# Lab 05: Visualization and Interactivity
 
 ## Project Theme
 
